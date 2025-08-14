@@ -1,6 +1,7 @@
 # Messages for Korean (한국어)
 # Exported from translatewiki.net
 # Author: Suleiman the Magnificent Television
+# Author: YeBoy371
 
 button.logout=로그아웃
 label.selectLanguage=선호하는 언어를 선택해 주세요.
@@ -271,8 +272,7 @@ content.confirmed={0}에 신청해 주셔서 감사합니다. 신청을 접수�
 title.createAnAccount=계정 만들기 또는 로그인
 title.signInModal=계정으로 로그인
 content.signInModal=계정을 만들면 신청 상태를 확인하거나 변경하고 다른 프로그램도 빠르게 신청할 수 있습니다.
-# Fuzzy
-content.pleaseCreateAccount=시 계정에 로그인하면 정보가 저장되며 나중에 언제든지 돌아와서 신청서를 마저 작성할 수 있습니다. 아직 계정이 없다면 로그인 페이지에서 계정을 새로 등록할 수 있습니다. 이미 입력한 데이터는 그대로 유지됩니다.
+content.pleaseCreateAccount={0} 계정에 로그인하거나 계정을 생성하여 데이터를 저장하세요. 언제든지 다시 방문하여 신청을 완료할 수 있습니다. 아직 계정이 없으신 경우, 로그인 페이지에서 가입하실 수 있으며, 이미 입력하신 데이터는 손실되지 않습니다.
 content.generalLoginModalPrompt=계정에 로그인되어 있지 않습니다. 계정이 없으면 신청서를 수정하거나, 신청서 상태를 확인하거나, 빠르게 다른 프로그램을 신청할 수 없습니다.
 content.initialLoginModalPrompt=계속하기 전에 {0} 계정에 로그인하거나 계정을 만드세요. 같은 정보를 다시 입력하지 않고도 여러 프로그램을 신청할 수 있습니다. 신청서를 수정하고 신청서 상태를 확인할 수도 있습니다.
 button.continueWithoutAnAccount=계정 없이 계속
