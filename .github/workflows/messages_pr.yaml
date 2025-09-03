@@ -1,0 +1,94 @@
+name: Create PR to civiform/civiform
+
+# Uses the civiform-github-automation/civiform fork to create a PR against civiform/civiform
+# with changes to messages files. Only runs on pushes to main that are NOT from the
+# civiform-github-automation.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'server/conf/i18n/**'
+
+jobs:
+    create-upstream-pr:
+      if: github.event.pusher.name != 'civiform-github-automation' && github.actor != 'civiform-github-automation'
+      runs-on: ubuntu-latest
+      
+      permissions:
+        contents: read
+      
+      steps:
+        - name: Checkout civiform-messages
+          uses: actions/checkout@v4
+          with:
+            path: civiform-messages
+  
+        - name: Checkout civiform-github-automation/civiform
+          uses: actions/checkout@v4
+          with:
+            repository: civiform-github-automation/civiform
+            token: ${{ secrets.CIVIFORM_AUTOMATION_CIVIFORM_FORK_WRITE }}
+            path: civiform
+  
+        - name: Setup fork and create branch with changes
+          run: |-
+            cd civiform
+            
+            git config user.name "civiform-github-automation"
+            git config user.email "civiform-dev@exygy.com"
+            
+            git remote add upstream https://github.com/civiform/civiform
+            git fetch upstream main
+
+            BRANCH_NAME="translations/$(date +%Y%m%d-%H%M%S)"
+            echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+            git checkout -b ${BRANCH_NAME} upstream/main
+  
+            cd ../civiform-messages
+            MESSAGES_COMMIT=$(git rev-parse HEAD)
+            echo "MESSAGES_COMMIT=${MESSAGES_COMMIT}" >> $GITHUB_ENV
+
+            cp ./server/conf/i18n/* ../civiform/server/conf/i18n/
+
+            cd ../civiform
+            if git diff --quiet; then
+              echo "No changes detected. Exiting."
+              echo "SKIP_PR=true" >> $GITHUB_ENV
+            else
+              echo "Changes detected:"
+              git diff --stat
+              echo "SKIP_PR=false" >> $GITHUB_ENV
+            fi
+  
+        - name: Commit and push branch to fork
+          if: env.SKIP_PR == 'false'
+          run: |-
+            cd civiform
+            git add server/conf/i18n/
+            
+            git commit -m "Sync i18n changes from civiform-messages
+  
+            Source: civiform/civiform-messages@${MESSAGES_COMMIT}"
+            
+            git push origin ${BRANCH_NAME}
+  
+        - name: Create Pull Request
+          if: env.SKIP_PR == 'false'
+          env:
+            GH_TOKEN: ${{ secrets.CIVIFORM_AUTOMATION_CIVIFORM_PR }}
+          run: |-
+            cd civiform
+            PR_URL=$(gh pr create \
+              --repo civiform/civiform \
+              --head civiform-github-automation:${BRANCH_NAME} \
+              --base main \
+              --reviewer civiform/developers \
+              --label "i18n" \
+              --title "Sync i18n changes from civiform-messages" \
+              --body "Source: civiform/civiform-messages@${MESSAGES_COMMIT}
+
+              This PR was automatically created by the civiform-messages sync workflow.
+              Review these changes carefully before merging!")
+            
+            echo "Created PR at ${PR_URL}"
