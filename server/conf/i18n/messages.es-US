@@ -755,6 +755,17 @@ validation.invalidDateFormat=Ingresa una fecha en el formato correcto.
 validation.dateBeyondAllowablePast=Ingresa una fecha dentro de los últimos {0} años
 # Date cannot be over specified years in future.
 validation.dateBeyondAllowableFuture=Ingresa una fecha dentro de los próximos {0} años
+# Valdation error shown when the user enters a date in the past but the question requires a date later than the current date.
+validation.futureDateRequired=La fecha debe ser posterior al día de hoy
+# Valdation error shown when the user enters a date that is earlier than the minimum allowed date.
+validation.dateTooFarInPast=La fecha debe ser posterior al {0}
+# Validation error shown when the user enters a date in the future but the question requires a date earlier than the current date.
+validation.pastDateRequired=La fecha debe ser anterior al día de hoy
+# Validation error shown when the user enters a date that is later than the maximum allowed date.
+validation.dateTooFarInFuture=La fecha debe ser anterior al {0}
+# Validation error shown when the user enters a date that is before or after the allowed date range.
+validation.dateNotInRange=La fecha debe ser entre el {0} y el {1}
+validation.currentDateRequired=Ingresa la fecha de hoy
 # A month option when selecting a specific date from a dropdown menu.
 option.memorableDate.January=01 - Enero
 # A month option when selecting a specific date from a dropdown menu.
@@ -894,6 +905,24 @@ validation.textTooLong=Debe tener menos de {0} caracteres.
 validation.textTooShort=Debe tener más de {0} caracteres.
 
 #---------------------------------------------------------------------#
+# YES/NO QUESTION - text specific to yes/no questions. #
+#---------------------------------------------------------------------#
+
+option.yes=Sí
+option.no=No
+option.notSure=No lo sé
+option.maybe=Tal vez
+
+#-------------------------------------------------------------#
+# MAP QUESTION - text specific to map questions.              #
+#-------------------------------------------------------------#
+
+# Link text for location details URLs
+map.locationLinkText=See more details
+# Text showing the count of displayed locations, with placeholders for current count and total count
+map.locationsCount=Displaying {0} of {1} locations
+
+#---------------------------------------------------------------------#
 # MULTI OPTION QUESTION ADMIN EDIT - text specific when creating/editing a multi option question. #
 #---------------------------------------------------------------------#
 
@@ -1004,6 +1033,9 @@ category.tag.housing=Vivienda
 # A tag used to filter the list of programs down to those that are related to the Internet.
 category.tag.internet=Internet
 
+# A tag used to filter the list of programs down to those that are related to the military.
+category.tag.military=Militar
+
 # A tag used to filter the list of programs down to those that are related to training.
 category.tag.training=Capacitación
 
@@ -1012,6 +1044,9 @@ category.tag.transportation=Transporte
 
 # A tag used to filter the list of programs down to those that are related to utilities.
 category.tag.utilities=Servicios públicos
+
+# A tag used to filter the list of programs down to those that are related to military veterans.
+category.tag.veteran=Veterano
 
 # An aria-label for screen readers that helps provide context for the category tags.
 ariaLabel.categories=Categorías
