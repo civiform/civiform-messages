@@ -1,5 +1,6 @@
 # Messages for Arabic (العربية)
 # Exported from translatewiki.net
+# Author: Meno25
 
 button.logout=تسجيل الخروج
 label.selectLanguage=يُرجى اختيار لغتك المفضّلة.
@@ -403,8 +404,8 @@ option.yes=نعم
 option.no=لا
 option.notSure=لا أعلم
 option.maybe=ربما
-map.locationLinkText=See more details
-map.locationsCount=Displaying {0} of {1} locations
+map.locationLinkText=شاهد المزيد من التفاصيل
+map.locationsCount=عرض {0} من {1} موقعًا
 adminValidation.multiOptionEmpty=لا يمكن ترك الأسئلة المتعددة الإجابات فارغة.
 adminValidation.multiOptionAdminError=يمكن أن تتضمن أسماء المشرفين الأحرف الصغيرة والأرقام والشُرط السفلية والشُرط العادية فقط.
 error.notFoundTitle=لم نتمكن من العثور على الصفحة التي حاولت زيارتها

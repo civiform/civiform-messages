@@ -1,5 +1,6 @@
 # Messages for Korean (한국어)
 # Exported from translatewiki.net
+# Author: Bisang
 # Author: Suleiman the Magnificent Television
 # Author: YeBoy371
 
@@ -401,12 +402,12 @@ validation.numberTooSmall=최솟값은 {0}입니다.
 validation.numberNonInteger=숫자는 양의 정수여야 하며, 0~9의 숫자만 포함해야 합니다.
 validation.textTooLong=최대 {0}자(영문 기준)를 포함해야 합니다.
 validation.textTooShort=최소 {0}자(영문 기준)를 포함해야 합니다.
-option.yes=네
+option.yes=예
 option.no=아니요
 option.notSure=잘 모르겠음
 option.maybe=확실하지 않음
-map.locationLinkText=See more details
-map.locationsCount=Displaying {0} of {1} locations
+map.locationLinkText=자세히 보기
+map.locationsCount={1}개 중 {0}개 위치 표시
 adminValidation.multiOptionEmpty=객관식 질문의 옵션은 비워둘 수 없습니다.
 adminValidation.multiOptionAdminError=관리자 이름에는 소문자, 숫자, 밑줄, 대시만 포함할 수 있습니다.
 error.notFoundTitle=방문하려는 페이지를 찾지 못했습니다
