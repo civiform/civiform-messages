@@ -61,16 +61,23 @@ jobs:
               echo "SKIP_PR=false" >> $GITHUB_ENV
             fi
   
+        - name: Import GPG Key
+          if: env.SKIP_PR == 'false'
+          uses: crazy-max/ghaction-import-gpg@v6
+          with:
+            gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+            passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
         - name: Commit and push branch to fork
           if: env.SKIP_PR == 'false'
           run: |-
             cd civiform
             git add server/conf/i18n/
-            
-            git commit -m "Sync i18n changes from civiform-messages
-  
+            # Use the -S flag to sign the commit
+            git commit -S -m "Sync i18n changes from civiform-messages
+
             Source: civiform/civiform-messages@${MESSAGES_COMMIT}"
-            
+
             git push origin ${BRANCH_NAME}
   
         - name: Create Pull Request
