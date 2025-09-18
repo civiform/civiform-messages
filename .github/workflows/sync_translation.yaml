@@ -39,9 +39,7 @@ jobs:
             LC_ALL=C cat "$1" | \
             tr -cd '\11\12\15\40-\176\n' | \
             tr -d '\r' | \
-            # Only process lines that contain an equals sign and are NOT comments/empty lines
-            grep -E '^[^#].*=' | \ 
-            # Use awk to print the first field, then sed to clean the key (remove internal spaces, etc.)
+            grep -E '^[^#].*=' | \
             awk -F'=' '{print $1}' | \
             sed 's/\s*$//' | \
             sed 's/^\s*//'
@@ -58,17 +56,24 @@ jobs:
             exit 0
           fi
 
-          BASE_KEYS=$(extract_keys "${MESSAGES_FILE}")
+          # 1. Extract and sort BASE_KEYS once into a temporary file
+          BASE_KEYS_FILE=$(mktemp)
+          extract_keys "${MESSAGES_FILE}" | sort > "$BASE_KEYS_FILE"
+          
           CHANGES=0
 
           for LANG_FILE in $LANGUAGE_FILES; do
             echo "Processing ${LANG_FILE}..."
             
-            # Extract keys from the language file
-            LANG_KEYS=$(extract_keys "${LANG_FILE}")
+            # 2. Extract and sort LANG_KEYS into a temporary file
+            LANG_KEYS_FILE=$(mktemp)
+            extract_keys "${LANG_FILE}" | sort > "$LANG_KEYS_FILE"
             
-            # Find keys in base file that are NOT in language file
-            NEW_KEYS=$(comm -23 <(echo "$BASE_KEYS" | sort) <(echo "$LANG_KEYS" | sort))
+            # 3. Use 'comm' directly on the sorted files (much more stable)
+            NEW_KEYS=$(comm -23 "$BASE_KEYS_FILE" "$LANG_KEYS_FILE")
+
+            # 4. Cleanup temp file
+            rm "$LANG_KEYS_FILE"
 
             if [ -z "$NEW_KEYS" ]; then
               echo "No new keys found for ${LANG_FILE}."
@@ -81,6 +86,9 @@ jobs:
               CHANGES=$((CHANGES + 1))
             fi
           done
+          
+          # 5. Cleanup base temp file
+          rm "$BASE_KEYS_FILE"
 
           if [ $CHANGES -gt 0 ]; then
             echo "Total files updated: ${CHANGES}"
