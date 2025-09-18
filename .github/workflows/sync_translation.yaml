@@ -44,9 +44,11 @@ jobs:
             sed 's/\s*$//'
           }
 
-          # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file.
-          LANGUAGE_FILES=$(find server/conf/i18n -name 'messages.*' -type f | grep -v "${MESSAGES_FILE}$")
-          
+          # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file and messages.en-US file.
+          LANGUAGE_FILES=$(find server/conf/i18n -name 'messages.*' -type f | \
+                           grep -v "${MESSAGES_FILE}$" | \
+                           grep -v "messages.en-US$")
+
           if [ -z "$LANGUAGE_FILES" ]; then
             echo "No language files (messages.<lang>) found. Skipping sync."
             echo "changes_made=false" >> $GITHUB_OUTPUT
