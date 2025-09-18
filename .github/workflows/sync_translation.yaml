@@ -73,7 +73,6 @@ jobs:
               echo "New keys found for ${LANG_FILE}. Appending..."
               
               # Append new keys with an empty value to the language file
-              echo "" >> "${LANG_FILE}"
               echo "$NEW_KEYS" | sed 's/$/=/' >> "${LANG_FILE}"
               
               CHANGES=$((CHANGES + 1))
