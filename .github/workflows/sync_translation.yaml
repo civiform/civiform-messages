@@ -35,14 +35,14 @@ jobs:
           
           # Function to extract, clean, and isolate keys for robust processing
           extract_keys() {
-            # Use LC_ALL=C for reliable byte-level text processing to avoid encoding crashes.
+            # Use LC_ALL=C for reliable byte-level text processing.
             LC_ALL=C cat "$1" | \
             tr -cd '\11\12\15\40-\176\n' | \
             tr -d '\r' | \
+            # Filter lines: Must not be a comment (#) and must contain an equals sign (=)
             grep -E '^[^#].*=' | \
-            awk -F'=' '{print $1}' | \
-            sed 's/\s*$//' | \
-            sed 's/^\s*//'
+            # Use awk to print the key, trimming all leading/trailing whitespace
+            awk -F'=' '{gsub(/^[ \t]+|[ \t]+$/, "", $1); print $1}'
           }
 
           # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file and messages.en-US file.
