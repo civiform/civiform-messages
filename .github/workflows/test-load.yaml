@@ -43,11 +43,12 @@ jobs:
 
           # Function to extract and clean keys
           extract_keys() {
-            # 1. Use 'tr -cd ...' to strip all non-printable and control characters (including null chars)
-            # 2. Use 'tr -d '\r'' to remove Windows CR line endings
-            # 3. Use 'grep -v' to filter comments/empty lines
-            # 4. Use 'awk' to get the key
-            cat "$1" | \
+            # Use LC_ALL=C to prevent grep/awk/sed from crashing on non-standard encoding/characters.
+            # 1. Use 'tr -cd ...' to strip control characters (most likely needed fix)
+            # 2. Use 'grep -v' to filter comments/empty lines
+            # 3. Use 'awk' to get the key
+            
+            LC_ALL=C cat "$1" | \
             tr -cd '\11\12\15\40-\176\n' | \
             tr -d '\r' | \
             grep -v '^\s*#\|^$' | \
