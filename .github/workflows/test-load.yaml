@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write # Needed to commit and push changes
+      contents: write         # Needed to checkout, commit, and push
+      pull-requests: write    # Needed to allow PR creation
 
     steps:
       - name: Checkout Repository
