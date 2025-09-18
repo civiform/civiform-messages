@@ -74,9 +74,6 @@ jobs:
               
               # Append new keys with an empty value to the language file
               echo "" >> "${LANG_FILE}"
-              echo "##################################################" >> "${LANG_FILE}"
-              echo "# Keys automatically added from base messages file" >> "${LANG_FILE}"
-              echo "##################################################" >> "${LANG_FILE}"
               echo "$NEW_KEYS" | sed 's/$/=/' >> "${LANG_FILE}"
               
               CHANGES=$((CHANGES + 1))
