@@ -5,8 +5,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main, annazhang-sync-translations]
-    paths:
-      - 'server/conf/i18n/messages'
 jobs:
   sync-messages:
     runs-on: ubuntu-latest
