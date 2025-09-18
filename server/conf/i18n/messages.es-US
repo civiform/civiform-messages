@@ -1096,3 +1096,16 @@ session.extended.error=No se pudo extender la sesión
 
 # Untranslated string for translation infrastructure testing.
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+##################################################
+# Keys automatically added from base messages file
+##################################################
+map.addFilterButton=
+map.addFiltersSubtitle=
+map.addFiltersTitle=
+map.displayNameLabel=
+map.keyLabel=
+map.locationAddressLabel=
+map.locationDetailsUrlLabel=
+map.locationNameLabel=
+map.maxLocationSelectionsLabel=
