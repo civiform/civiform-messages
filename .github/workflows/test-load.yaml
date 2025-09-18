@@ -40,7 +40,7 @@ jobs:
 
           # Function to extract keys from a messages file, ignoring comments and empty lines
           extract_keys() {
-            grep -v '^\s*#\|^$' "$1" | awk -F'=' '{print $1}' | sed 's/\s*$//'
+            grep -v '^\s*#\|^$' "$1" | tr -d '\r' | awk -F'=' '{print $1}' | sed 's/\s*$//'
           }
 
           BASE_KEYS=$(extract_keys "${MESSAGES_FILE}")
