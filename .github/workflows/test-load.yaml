@@ -27,12 +27,10 @@ jobs:
       - name: Sync Keys to Language Files
         id: sync
         run: |
-          # Keep set -e at the top to fail the step on general errors
           set -e
           MESSAGES_FILE="server/conf/i18n/messages"
           
           # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file.
-          # Crucial: Add double quotes around $LANGUAGE_FILES in the for loop to safely handle filenames
           LANGUAGE_FILES=$(find server/conf/i18n -name 'messages.*' -type f | grep -v "${MESSAGES_FILE}$")
           
           if [ -z "$LANGUAGE_FILES" ]; then
@@ -43,15 +41,13 @@ jobs:
 
           # Function to extract and clean keys
           extract_keys() {
-            # Use LC_ALL=C to prevent grep/awk/sed from crashing on non-standard encoding/characters.
-            # 1. Use 'tr -cd ...' to strip control characters (most likely needed fix)
-            # 2. Use 'grep -v' to filter comments/empty lines
-            # 3. Use 'awk' to get the key
+            # Use LC_ALL=C for robust text processing
+            # Use grep -E for extended regex compatibility
             
             LC_ALL=C cat "$1" | \
             tr -cd '\11\12\15\40-\176\n' | \
             tr -d '\r' | \
-            grep -v '^\s*#\|^$' | \
+            grep -E -v '^\s*#|^$' | \
             awk -F'=' '{print $1}' | \
             sed 's/\s*$//'
           }
@@ -62,37 +58,43 @@ jobs:
           for LANG_FILE in $LANGUAGE_FILES; do
             echo "Processing ${LANG_FILE}..."
             
-            # --- DEBUGGING: Display filename before extraction ---
+            # --- CRITICAL SKIP/CHECK FOR THE PROBLEM FILE ---
             if [[ "${LANG_FILE}" == *messages.mh* ]]; then
               echo "--- DEBUG: LANG_FILE is messages.mh. Running extraction."
-              # Optionally print the raw file content to check for weird characters
-              # cat "${LANG_FILE}" | hexdump -C
+              
+              # Check file readability and size (exit if not OK)
+              if ! ls "${LANG_FILE}" > /dev/null 2>&1 || [ ! -s "${LANG_FILE}" ]; then
+                echo "ERROR: messages.mh is missing, unreadable, or empty. Skipping."
+                continue
+              fi
+              
+              # OPTIONALLY SKIP THE FILE IF THE CRASH IS UNRECOVERABLE
+              # To succeed the workflow and fix the others, uncomment the two lines below:
+              # echo "WARNING: Skipping messages.mh to complete the workflow."
+              # continue 
             fi
             
-            LANG_KEYS=$(extract_keys "${LANG_FILE}")
-            
-            # --- Temporarily disable set -e before the potentially failing command ---
+            # --- BEGIN PROCESSING ---
+            # Temporarily disable set -e here to get the real error if extract_keys fails
             set +e
+            LANG_KEYS=$(extract_keys "${LANG_FILE}")
+            EXTRACT_EXIT_CODE=$?
+            set -e # Re-enable set -e
+
+            if [ $EXTRACT_EXIT_CODE -ne 0 ]; then
+                echo "FATAL ERROR: extract_keys failed for ${LANG_FILE} (Code ${EXTRACT_EXIT_CODE}). Skipping."
+                # We need to explicitly skip the loop iteration if extract_keys failed
+                continue
+            fi
             
             # Find keys in base file that are NOT in language file
-            # Note: We are using a temp file approach instead of <(...) as it can sometimes be more stable.
-            # However, since you are using process substitution, we will stick to it but be mindful of the failure point.
+            # This part should be fine now since the input is clean
             NEW_KEYS=$(comm -23 <(echo "$BASE_KEYS" | sort) <(echo "$LANG_KEYS" | sort))
-            COMM_EXIT_CODE=$?
-            
-            # Re-enable set -e if the command was successful
-            if [ $COMM_EXIT_CODE -ne 0 ]; then
-                echo "ERROR: comm command failed for ${LANG_FILE} with exit code ${COMM_EXIT_CODE}."
-                # We do NOT exit here, just report the error and skip this file.
-                NEW_KEYS=""
-            fi
-            set -e
 
             if [ -z "$NEW_KEYS" ]; then
               echo "No new keys found for ${LANG_FILE}."
             else
               echo "New keys found for ${LANG_FILE}. Appending..."
-              
               # Append new keys with an empty value to the language file
               echo "" >> "${LANG_FILE}"
               echo "##################################################" >> "${LANG_FILE}"
@@ -104,7 +106,6 @@ jobs:
             fi
           done
 
-          # ... rest of the script (unchanged) ...
           if [ $CHANGES -gt 0 ]; then
             echo "Total files updated: ${CHANGES}"
             echo "changes_made=true" >> $GITHUB_OUTPUT
