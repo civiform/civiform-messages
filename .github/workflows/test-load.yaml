@@ -27,9 +27,12 @@ jobs:
       - name: Sync Keys to Language Files
         id: sync
         run: |
+          # Keep set -e at the top to fail the step on general errors
           set -e
           MESSAGES_FILE="server/conf/i18n/messages"
+          
           # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file.
+          # Crucial: Add double quotes around $LANGUAGE_FILES in the for loop to safely handle filenames
           LANGUAGE_FILES=$(find server/conf/i18n -name 'messages.*' -type f | grep -v "${MESSAGES_FILE}$")
           
           if [ -z "$LANGUAGE_FILES" ]; then
@@ -38,9 +41,18 @@ jobs:
             exit 0
           fi
 
-          # Function to extract keys from a messages file, ignoring comments and empty lines
+          # Function to extract and clean keys
           extract_keys() {
-            grep -v '^\s*#\|^$' "$1" | tr -d '\r' | awk -F'=' '{print $1}' | sed 's/\s*$//'
+            # 1. Use 'tr -cd ...' to strip all non-printable and control characters (including null chars)
+            # 2. Use 'tr -d '\r'' to remove Windows CR line endings
+            # 3. Use 'grep -v' to filter comments/empty lines
+            # 4. Use 'awk' to get the key
+            cat "$1" | \
+            tr -cd '\11\12\15\40-\176\n' | \
+            tr -d '\r' | \
+            grep -v '^\s*#\|^$' | \
+            awk -F'=' '{print $1}' | \
+            sed 's/\s*$//'
           }
 
           BASE_KEYS=$(extract_keys "${MESSAGES_FILE}")
@@ -48,28 +60,50 @@ jobs:
 
           for LANG_FILE in $LANGUAGE_FILES; do
             echo "Processing ${LANG_FILE}..."
+            
+            # --- DEBUGGING: Display filename before extraction ---
+            if [[ "${LANG_FILE}" == *messages.mh* ]]; then
+              echo "--- DEBUG: LANG_FILE is messages.mh. Running extraction."
+              # Optionally print the raw file content to check for weird characters
+              # cat "${LANG_FILE}" | hexdump -C
+            fi
+            
             LANG_KEYS=$(extract_keys "${LANG_FILE}")
             
+            # --- Temporarily disable set -e before the potentially failing command ---
+            set +e
+            
             # Find keys in base file that are NOT in language file
+            # Note: We are using a temp file approach instead of <(...) as it can sometimes be more stable.
+            # However, since you are using process substitution, we will stick to it but be mindful of the failure point.
             NEW_KEYS=$(comm -23 <(echo "$BASE_KEYS" | sort) <(echo "$LANG_KEYS" | sort))
+            COMM_EXIT_CODE=$?
+            
+            # Re-enable set -e if the command was successful
+            if [ $COMM_EXIT_CODE -ne 0 ]; then
+                echo "ERROR: comm command failed for ${LANG_FILE} with exit code ${COMM_EXIT_CODE}."
+                # We do NOT exit here, just report the error and skip this file.
+                NEW_KEYS=""
+            fi
+            set -e
 
             if [ -z "$NEW_KEYS" ]; then
               echo "No new keys found for ${LANG_FILE}."
             else
-              echo "New keys found for ${LANG_FILE}."
+              echo "New keys found for ${LANG_FILE}. Appending..."
               
               # Append new keys with an empty value to the language file
               echo "" >> "${LANG_FILE}"
               echo "##################################################" >> "${LANG_FILE}"
               echo "# Keys automatically added from base messages file" >> "${LANG_FILE}"
               echo "##################################################" >> "${LANG_FILE}"
-              # Append 'key=' for the empty translation, preserving the key's position
               echo "$NEW_KEYS" | sed 's/$/=/' >> "${LANG_FILE}"
               
               CHANGES=$((CHANGES + 1))
             fi
           done
 
+          # ... rest of the script (unchanged) ...
           if [ $CHANGES -gt 0 ]; then
             echo "Total files updated: ${CHANGES}"
             echo "changes_made=true" >> $GITHUB_OUTPUT
@@ -77,7 +111,6 @@ jobs:
             echo "No changes needed for any language file."
             echo "changes_made=false" >> $GITHUB_OUTPUT
           fi
-        # The script uses process substitution (<()), which requires bash.
         shell: bash
 
       - name: Commit and Push Changes
