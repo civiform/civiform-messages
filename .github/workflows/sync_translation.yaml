@@ -4,7 +4,7 @@ name: Sync New Keys to Translations
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main,annazhang-change-workflow]
 
 jobs:
   sync-messages:
@@ -39,9 +39,12 @@ jobs:
             LC_ALL=C cat "$1" | \
             tr -cd '\11\12\15\40-\176\n' | \
             tr -d '\r' | \
-            grep -E -v '^\s*#|^$' | \
+            # Only process lines that contain an equals sign and are NOT comments/empty lines
+            grep -E '^[^#].*=' | \ 
+            # Use awk to print the first field, then sed to clean the key (remove internal spaces, etc.)
             awk -F'=' '{print $1}' | \
-            sed 's/\s*$//'
+            sed 's/\s*$//' | \
+            sed 's/^\s*//'
           }
 
           # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file and messages.en-US file.
