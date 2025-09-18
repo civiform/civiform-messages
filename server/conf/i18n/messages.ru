@@ -466,3 +466,17 @@ session.extend.button=Продлить сеанс
 session.extended.success=Сеанс продлен.
 session.extended.error=Не удалось продлить сеанс.
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+##################################################
+# Keys automatically added from base messages file
+##################################################
+link.edit=
+map.addFilterButton=
+map.addFiltersSubtitle=
+map.addFiltersTitle=
+map.displayNameLabel=
+map.keyLabel=
+map.locationAddressLabel=
+map.locationDetailsUrlLabel=
+map.locationNameLabel=
+map.maxLocationSelectionsLabel=
