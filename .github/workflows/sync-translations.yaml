@@ -2,11 +2,10 @@ name: Sync New Keys to Translations
 
 # Trigger the workflow on pushes to main that modify the base messages file,
 # and allow for manual dispatch.
-# test test
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, annazhang-sync-translations]
     paths:
       - 'server/conf/i18n/messages'
 
