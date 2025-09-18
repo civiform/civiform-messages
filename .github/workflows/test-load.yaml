@@ -142,7 +142,6 @@ jobs:
           PR_URL=$(gh pr create \
             --head ${{ env.BRANCH_NAME }} \
             --base main \
-            --label "i18n" \
             --title "chore(i18n): Sync new keys to translation files" \
             --body "$PR_BODY")
             
