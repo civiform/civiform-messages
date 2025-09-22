@@ -79,7 +79,7 @@ jobs:
               while read -r NEW_KEY; do
                 # Use grep to find the full line in the base messages file
                 # The -F flag treats the pattern as a fixed string, and -m 1 stops after the first match
-                # FIX: Add `|| true` to prevent the script from failing if no match is found
+                # Add `|| true` to prevent the script from failing if no match is found
                 NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -F -m 1 "^${NEW_KEY}=" || true)
                 
                 # Append the new key-value pair to the language file
@@ -102,15 +102,24 @@ jobs:
         shell: bash
 
       - name: Commit and Push Changes
+        id: commit
         if: steps.sync.outputs.changes_made == 'true'
         run: |
           git checkout -b ${{ env.BRANCH_NAME }}
           git add server/conf/i18n/messages.*
-          git commit -m "chore(i18n): Sync new keys and values from messages to messages.<lang> files"
-          git push origin ${{ env.BRANCH_NAME }}
+          
+          # Check for staged changes before committing to prevent failure
+          if ! git diff-index --quiet --cached HEAD; then
+            git commit -m "chore(i18n): Sync new keys and values from messages to messages.<lang> files"
+            git push origin ${{ env.BRANCH_NAME }}
+            echo "pr_needed=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changes to commit. Skipping git commit and push."
+            echo "pr_needed=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create Pull Request
-        if: steps.sync.outputs.changes_made == 'true'
+        if: steps.commit.outputs.pr_needed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
