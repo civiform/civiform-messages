@@ -36,9 +36,16 @@ jobs:
           
           # Function to extract, clean, and isolate keys (reads from STDIN)
           extract_keys() {
+            # 1. Remove BOM if present (often invisible, but breaks matching)
+            # 2. Remove comment lines and blank lines
+            # 3. Use awk to isolate the key (field 1, split by '=')
+            # 4. Use tr to delete common invisible characters like non-breaking spaces (\u00A0)
+            # 5. Use sed to trim ALL leading and trailing whitespace.
+            tr -d '\xEF\xBB\xBF' | \
             grep -E -v '^\s*#|^$' | \
             awk -F'=' '{print $1}' | \
-            sed 's/\s*$//'
+            tr -d '\xC2\xA0\x09' | \
+            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
           }
 
           # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file and messages.en-US file.
