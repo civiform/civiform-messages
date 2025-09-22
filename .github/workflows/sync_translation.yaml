@@ -34,7 +34,7 @@ jobs:
           set -e
           MESSAGES_FILE="server/conf/i18n/messages"
           
-          # Function to extract, clean, and isolate keys for robust processing
+          # Function to extract, clean, and isolate keys (reads from STDIN)
           extract_keys() {
             grep -E -v '^\s*#|^$' | \
             awk -F'=' '{print $1}' | \
@@ -54,16 +54,19 @@ jobs:
 
           # Store the content of the base messages file for later lookup
           MESSAGES_CONTENT=$(cat "${MESSAGES_FILE}")
-          BASE_KEYS=$(extract_keys "${MESSAGES_FILE}")
+          
+          # Read base keys by piping the file content to the function
+          BASE_KEYS=$(cat "${MESSAGES_FILE}" | extract_keys)
           CHANGES=0
 
           for LANG_FILE in $LANGUAGE_FILES; do
             echo "Processing ${LANG_FILE}..."
             
-            # Extract keys from the language file
-            LANG_KEYS=$(extract_keys "${LANG_FILE}")
+            # Extract keys from the language file by piping content
+            LANG_KEYS=$(cat "${LANG_FILE}" | extract_keys)
             
             # Find keys in base file that are NOT in language file
+            # Note: Process substitution is a bash feature, which you've specified with shell: bash.
             NEW_KEYS=$(comm -23 <(echo "$BASE_KEYS" | sort) <(echo "$LANG_KEYS" | sort))
 
             if [ -z "$NEW_KEYS" ]; then
@@ -73,9 +76,8 @@ jobs:
               
               # Loop through each new key and find its corresponding line in the base file
               while read -r NEW_KEY; do
-                # Use grep to find the full line in the base messages file
-                # The -F flag treats the pattern as a fixed string, and -m 1 stops after the first match
-                NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -m 1 "^${NEW_KEY}=")
+                # Use grep with -F (fixed string) to safely find the full line in the base messages file
+                NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -F -m 1 "^${NEW_KEY}=")
                 
                 # Append the new key-value pair to the language file
                 if [ -n "$NEW_LINE" ]; then
