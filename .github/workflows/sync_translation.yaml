@@ -74,7 +74,7 @@ jobs:
             
             # Find keys in base file that are NOT in language file
             # Note: Process substitution is a bash feature, which you've specified with shell: bash.
-            NEW_KEYS=$(comm -23 <(echo "$BASE_KEYS" | sort) <(echo "$LANG_KEYS" | sort))
+            NEW_KEYS=$(comm -23 <(printf '%s\n' "$BASE_KEYS" | sort) <(printf '%s\n' "$LANG_KEYS" | sort))
 
             if [ -z "$NEW_KEYS" ]; then
               echo "No new keys found for ${LANG_FILE}."
