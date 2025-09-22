@@ -36,10 +36,8 @@ jobs:
           # Function to extract, clean, and isolate keys for robust processing
           extract_keys() {
             # Use LC_ALL=C for reliable byte-level text processing to avoid encoding crashes.
-            LC_ALL=C cat "$1" | \
-            # FIX: Only remove specific problematic characters, not a whole range.
+            LC_ALL=C grep -E -v '^\s*#|^$' | \
             tr -d '\r\xEF\xBB\xBF\xC2\xA0' | \
-            grep -E -v '^\s*#|^$' | \
             awk -F'=' '{print $1}' | \
             sed 's/\s*$//'
           }
@@ -58,14 +56,19 @@ jobs:
           # Store the content of the base messages file for later lookup
           MESSAGES_CONTENT=$(cat "${MESSAGES_FILE}")
 
-          # FIX: Write base keys to a temporary file to ensure proper sorting for comm
+          # Write base keys to a temporary file to ensure proper sorting for comm
           cat "${MESSAGES_FILE}" | extract_keys | sort > base_keys_sorted.tmp
           CHANGES=0
 
           for LANG_FILE in $LANGUAGE_FILES; do
+            # FIX: Skip any empty or invalid file names
+            if [ -z "$LANG_FILE" ]; then
+              continue
+            fi
+
             echo "Processing ${LANG_FILE}..."
             
-            # FIX: Write language keys to a temporary file for comparison
+            # Write language keys to a temporary file for comparison
             cat "${LANG_FILE}" | extract_keys | sort > lang_keys_sorted.tmp
             
             # Find keys in base file that are NOT in language file by comparing the temp files.
