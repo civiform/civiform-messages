@@ -98,7 +98,7 @@ jobs:
         if: steps.sync.outputs.changes_made == 'true'
         run: |
           git checkout -b ${{ env.BRANCH_NAME }}
-          git add server/conf/i18n/messages.*
+          git add -u server/conf/i18n/
           git status
           git diff
           # Check for staged changes before committing to prevent failure
