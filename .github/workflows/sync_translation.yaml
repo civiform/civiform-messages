@@ -98,10 +98,9 @@ jobs:
         if: steps.sync.outputs.changes_made == 'true'
         run: |
           git checkout -b ${{ env.BRANCH_NAME }}
-          git add -u server/conf/i18n/
+          git add server/conf/i18n/
           git status
           git diff
-          # Check for staged changes before committing to prevent failure
           if ! git diff-index --quiet --cached HEAD; then
             git commit -m "chore(i18n): Sync new keys and values from messages to messages.<lang> files"
             git push origin ${{ env.BRANCH_NAME }}
@@ -110,6 +109,7 @@ jobs:
             echo "No changes to commit. Skipping git commit and push."
             echo "pr_needed=false" >> $GITHUB_OUTPUT
           fi
+
       - name: Create Pull Request
         if: steps.commit.outputs.pr_needed == 'true'
         env:
