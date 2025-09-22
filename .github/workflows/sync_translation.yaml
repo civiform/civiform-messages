@@ -4,7 +4,7 @@ name: Sync New Keys to Translations
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main,annazhang-sync-value]
 
 jobs:
   sync-messages:
@@ -26,7 +26,7 @@ jobs:
           git config user.email "civiform-dev@exygy.com"
           echo "BRANCH_NAME=sync-i18n/$(date +%Y%m%d-%H%M%S)" >> $GITHUB_ENV
 
-      - name: Sync Keys to Language Files
+      - name: Sync Keys and Values to Language Files
         id: sync
         run: |
           # Use set -e for general failure detection
@@ -55,6 +55,8 @@ jobs:
             exit 0
           fi
 
+          # Store the content of the base messages file for later lookup
+          MESSAGES_CONTENT=$(cat "${MESSAGES_FILE}")
           BASE_KEYS=$(extract_keys "${MESSAGES_FILE}")
           CHANGES=0
 
@@ -70,10 +72,19 @@ jobs:
             if [ -z "$NEW_KEYS" ]; then
               echo "No new keys found for ${LANG_FILE}."
             else
-              echo "New keys found for ${LANG_FILE}. Appending..."
+              echo "New keys found for ${LANG_FILE}. Appending with values..."
               
-              # Append new keys with an empty value to the language file
-              echo "$NEW_KEYS" | sed 's/$/=/' >> "${LANG_FILE}"
+              # Loop through each new key and find its corresponding line in the base file
+              while read -r NEW_KEY; do
+                # Use grep to find the full line in the base messages file
+                # The -F flag treats the pattern as a fixed string, and -m 1 stops after the first match
+                NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -m 1 "^${NEW_KEY}=")
+                
+                # Append the new key-value pair to the language file
+                if [ -n "$NEW_LINE" ]; then
+                  echo "${NEW_LINE}" >> "${LANG_FILE}"
+                fi
+              done <<< "$NEW_KEYS"
               
               CHANGES=$((CHANGES + 1))
             fi
@@ -93,7 +104,7 @@ jobs:
         run: |
           git checkout -b ${{ env.BRANCH_NAME }}
           git add server/conf/i18n/messages.*
-          git commit -m "chore(i18n): Sync new keys from messages to messages.<lang> files"
+          git commit -m "chore(i18n): Sync new keys and values from messages to messages.<lang> files"
           git push origin ${{ env.BRANCH_NAME }}
 
       - name: Create Pull Request
@@ -101,15 +112,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_BODY="This PR was automatically created by the 'Sync New Keys to Translations' workflow to ensure all translation files contain the new keys added to the base \`messages\` file.
+          PR_BODY="This PR was automatically created by the 'Sync New Keys to Translations' workflow to ensure all translation files contain the new keys and their values added to the base \`messages\` file.
 
-          Crucially, only the new keys are added with an empty value (e.g., \`new.key.name=\`). Existing translations are preserved.
-          Please review the added empty keys and ensure they are ready for translation."
+          The new values from the base file are a starting point for translators. Please review the added entries and update the translations as needed."
           
           PR_URL=$(gh pr create \
             --head ${{ env.BRANCH_NAME }} \
             --base main \
-            --title "chore(i18n): Sync new keys to translation files" \
+            --title "chore(i18n): Sync new keys and values to translation files" \
             --body "$PR_BODY")
             
           echo "Created PR at ${PR_URL}"
