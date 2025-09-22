@@ -84,7 +84,8 @@ jobs:
                 
                 # Append the new key-value pair to the language file
                 if [ -n "$NEW_LINE" ]; then
-                  echo "${NEW_LINE}" >> "${LANG_FILE}"
+                  # FIX: Use printf to correctly handle newlines and tr to ensure only printable characters are written.
+                  printf "%s\n" "${NEW_LINE}" | tr -cd '\11\12\15\40-\176\n' >> "${LANG_FILE}"
                 fi
               done <<< "$NEW_KEYS"
               
