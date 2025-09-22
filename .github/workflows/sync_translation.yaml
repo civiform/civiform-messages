@@ -103,6 +103,9 @@ jobs:
       - name: Commit and Push Changes
         if: steps.sync.outputs.changes_made == 'true'
         run: |
+          # Convert line endings to a standard format that Git recognizes
+          dos2unix server/conf/i18n/messages.*
+        run: |
           git checkout -b ${{ env.BRANCH_NAME }}
           git add server/conf/i18n/messages.*
           git commit -m "chore(i18n): Sync new keys and values from messages to messages.<lang> files"
