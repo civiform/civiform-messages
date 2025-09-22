@@ -99,7 +99,8 @@ jobs:
         run: |
           git checkout -b ${{ env.BRANCH_NAME }}
           git add server/conf/i18n/messages.*
-          
+          git status
+          git diff
           # Check for staged changes before committing to prevent failure
           if ! git diff-index --quiet --cached HEAD; then
             git commit -m "chore(i18n): Sync new keys and values from messages to messages.<lang> files"
