@@ -25,7 +25,6 @@ jobs:
           git config user.name "civiform-github-automation"
           git config user.email "civiform-dev@exygy.com"
           echo "BRANCH_NAME=sync-i18n/$(date +%Y%m%d-%H%M%S)" >> $GITHUB_ENV
-
       - name: Sync Keys and Values to Language Files
         id: sync
         run: |
@@ -36,45 +35,34 @@ jobs:
           # Function to extract, clean, and isolate keys for robust processing
           extract_keys() {
             # Use LC_ALL=C for reliable byte-level text processing to avoid encoding crashes.
-            LC_ALL=C grep -E -v '^\s*#|^$' | \
-            tr -d '\r\xEF\xBB\xBF\xC2\xA0' | \
+            LC_ALL=C cat "$1" | \
+            tr -cd '\11\12\15\40-\176\n' | \
+            tr -d '\r' | \
+            grep -E -v '^\s*#|^$' | \
             awk -F'=' '{print $1}' | \
             sed 's/\s*$//'
           }
-
           # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file and messages.en-US file.
           LANGUAGE_FILES=$(find server/conf/i18n -name 'messages.*' -type f | \
                            grep -v "${MESSAGES_FILE}$" | \
                            grep -v "messages.en-US$")
-
           if [ -z "$LANGUAGE_FILES" ]; then
             echo "No language files (messages.<lang>) found. Skipping sync."
             echo "changes_made=false" >> $GITHUB_OUTPUT
             exit 0
           fi
-
           # Store the content of the base messages file for later lookup
           MESSAGES_CONTENT=$(cat "${MESSAGES_FILE}")
-
-          # Write base keys to a temporary file to ensure proper sorting for comm
-          cat "${MESSAGES_FILE}" | extract_keys | sort > base_keys_sorted.tmp
+          BASE_KEYS=$(extract_keys "${MESSAGES_FILE}")
           CHANGES=0
-
           for LANG_FILE in $LANGUAGE_FILES; do
-            # FIX: Skip any empty or invalid file names
-            if [ -z "$LANG_FILE" ]; then
-              continue
-            fi
-
             echo "Processing ${LANG_FILE}..."
             
-            # Write language keys to a temporary file for comparison
-            cat "${LANG_FILE}" | extract_keys | sort > lang_keys_sorted.tmp
+            # Extract keys from the language file
+            LANG_KEYS=$(extract_keys "${LANG_FILE}")
             
-            # Find keys in base file that are NOT in language file by comparing the temp files.
-            # Use `|| true` to prevent the script from exiting if comm fails (unmatched lines return code 1)
-            NEW_KEYS=$(comm -23 base_keys_sorted.tmp lang_keys_sorted.tmp || true)
-
+            # Find keys in base file that are NOT in language file
+            NEW_KEYS=$(comm -23 <(printf '%s\n' "$BASE_KEYS" | sort) <(printf '%s\n' "$LANG_KEYS" | sort))
             if [ -z "$NEW_KEYS" ]; then
               echo "No new keys found for ${LANG_FILE}."
             else
@@ -88,15 +76,14 @@ jobs:
                 
                 # Append the new key-value pair to the language file
                 if [ -n "$NEW_LINE" ]; then
-                  # Use printf and tr to write a clean, standardized line that Git can recognize as a change.
-                  printf "%s\n" "${NEW_LINE}" | tr -d '\r\xEF\xBB\xBF\xC2\xA0' >> "${LANG_FILE}"
+                  # FIX: Use printf to correctly handle newlines and tr to ensure only printable characters are written.
+                  printf "%s\n" "${NEW_LINE}" | tr -cd '\11\12\15\40-\176\n' >> "${LANG_FILE}"
                 fi
               done <<< "$NEW_KEYS"
               
               CHANGES=$((CHANGES + 1))
             fi
           done
-
           if [ $CHANGES -gt 0 ]; then
             echo "Total files updated: ${CHANGES}"
             echo "changes_made=true" >> $GITHUB_OUTPUT
@@ -110,12 +97,6 @@ jobs:
         id: commit
         if: steps.sync.outputs.changes_made == 'true'
         run: |
-          # Install dos2unix to standardize line endings
-          sudo apt-get update && sudo apt-get install -y dos2unix
-          
-          # Convert line endings to a standard format that Git recognizes
-          dos2unix server/conf/i18n/messages.*
-          
           git checkout -b ${{ env.BRANCH_NAME }}
           git add server/conf/i18n/messages.*
           
@@ -128,14 +109,12 @@ jobs:
             echo "No changes to commit. Skipping git commit and push."
             echo "pr_needed=false" >> $GITHUB_OUTPUT
           fi
-
       - name: Create Pull Request
         if: steps.commit.outputs.pr_needed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_BODY="This PR was automatically created by the 'Sync New Keys to Translations' workflow to ensure all translation files contain the new keys and their values added to the base \`messages\` file.
-
           The new values from the base file are a starting point for translators. Please review the added entries and update the translations as needed."
           
           PR_URL=$(gh pr create \
