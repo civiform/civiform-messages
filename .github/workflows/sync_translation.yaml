@@ -1,7 +1,6 @@
-name: Sync New Keys to Translations
+name: Sync New Keys and Values to Translations
 # Trigger the workflow on pushes to main that modify the base messages file,
 # and allow for manual dispatch.
-# test test
 on:
   workflow_dispatch:
   push:
@@ -34,18 +33,15 @@ jobs:
           set -e
           MESSAGES_FILE="server/conf/i18n/messages"
           
-          # Function to extract, clean, and isolate keys (reads from STDIN)
+          # Function to extract, clean, and isolate keys for robust processing
           extract_keys() {
-            # 1. Remove BOM if present (often invisible, but breaks matching)
-            # 2. Remove comment lines and blank lines
-            # 3. Use awk to isolate the key (field 1, split by '=')
-            # 4. Use tr to delete common invisible characters like non-breaking spaces (\u00A0)
-            # 5. Use sed to trim ALL leading and trailing whitespace.
-            tr -d '\xEF\xBB\xBF' | \
+            # Use LC_ALL=C for reliable byte-level text processing to avoid encoding crashes.
+            LC_ALL=C cat "$1" | \
+            tr -cd '\11\12\15\40-\176\n' | \
+            tr -d '\r' | \
             grep -E -v '^\s*#|^$' | \
             awk -F'=' '{print $1}' | \
-            tr -d '\xC2\xA0\x09' | \
-            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+            sed 's/\s*$//'
           }
 
           # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file and messages.en-US file.
@@ -61,20 +57,18 @@ jobs:
 
           # Store the content of the base messages file for later lookup
           MESSAGES_CONTENT=$(cat "${MESSAGES_FILE}")
-          
-          # Read base keys by piping the file content to the function
-          BASE_KEYS=$(cat "${MESSAGES_FILE}" | extract_keys)
+
+          BASE_KEYS=$(extract_keys "${MESSAGES_FILE}")
           CHANGES=0
 
           for LANG_FILE in $LANGUAGE_FILES; do
             echo "Processing ${LANG_FILE}..."
             
-            # Extract keys from the language file by piping content
-            LANG_KEYS=$(cat "${LANG_FILE}" | extract_keys)
+            # Extract keys from the language file
+            LANG_KEYS=$(extract_keys "${LANG_FILE}")
             
             # Find keys in base file that are NOT in language file
-            # Note: Process substitution is a bash feature, which you've specified with shell: bash.
-            NEW_KEYS=$(comm -23 <(printf '%s\n' "$BASE_KEYS" | sort) <(printf '%s\n' "$LANG_KEYS" | sort))
+            NEW_KEYS=$(comm -23 <(echo "$BASE_KEYS" | sort) <(echo "$LANG_KEYS" | sort))
 
             if [ -z "$NEW_KEYS" ]; then
               echo "No new keys found for ${LANG_FILE}."
@@ -83,7 +77,8 @@ jobs:
               
               # Loop through each new key and find its corresponding line in the base file
               while read -r NEW_KEY; do
-                # Use grep with -F (fixed string) to safely find the full line in the base messages file
+                # Use grep to find the full line in the base messages file
+                # The -F flag treats the pattern as a fixed string, and -m 1 stops after the first match
                 NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -F -m 1 "^${NEW_KEY}=")
                 
                 # Append the new key-value pair to the language file
