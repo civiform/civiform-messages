@@ -71,7 +71,7 @@ jobs:
               while read -r NEW_KEY; do
                 # Use grep to find the full line in the base messages file
                 # The -F flag treats the pattern as a fixed string, and -m 1 stops after the first match
-                NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -F -m 1 "^${NEW_KEY}=" || true)
+                NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -E -m 1 "^${NEW_KEY}\s*=" || true)
                 
                 # Append the new key-value pair to the language file
                 if [ -n "$NEW_LINE" ]; then
