@@ -4,7 +4,7 @@ name: Sync New Keys and Values to Translations
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main,annazhang-final-attemp-to-fix-workflow]
 
 jobs:
   sync-messages:
@@ -25,7 +25,6 @@ jobs:
           git config user.name "civiform-github-automation"
           git config user.email "civiform-dev@exygy.com"
           echo "BRANCH_NAME=sync-i18n/$(date +%Y%m%d-%H%M%S)" >> $GITHUB_ENV
-
       - name: Sync Keys and Values to Language Files
         id: sync
         run: |
@@ -37,30 +36,24 @@ jobs:
           extract_keys() {
             # Use LC_ALL=C for reliable byte-level text processing to avoid encoding crashes.
             LC_ALL=C cat "$1" | \
-            tr -cd '\11\12\15\40-\176\n' | \
             tr -d '\r' | \
             grep -E -v '^\s*#|^$' | \
             awk -F'=' '{print $1}' | \
             sed 's/\s*$//'
           }
-
           # Find all language files (messages.fr, messages.am, etc.) but exclude the base messages file and messages.en-US file.
           LANGUAGE_FILES=$(find server/conf/i18n -name 'messages.*' -type f | \
                            grep -v "${MESSAGES_FILE}$" | \
                            grep -v "messages.en-US$")
-
           if [ -z "$LANGUAGE_FILES" ]; then
             echo "No language files (messages.<lang>) found. Skipping sync."
             echo "changes_made=false" >> $GITHUB_OUTPUT
             exit 0
           fi
-
           # Store the content of the base messages file for later lookup
           MESSAGES_CONTENT=$(cat "${MESSAGES_FILE}")
-
           BASE_KEYS=$(extract_keys "${MESSAGES_FILE}")
           CHANGES=0
-
           for LANG_FILE in $LANGUAGE_FILES; do
             echo "Processing ${LANG_FILE}..."
             
@@ -69,7 +62,6 @@ jobs:
             
             # Find keys in base file that are NOT in language file
             NEW_KEYS=$(comm -23 <(printf '%s\n' "$BASE_KEYS" | sort) <(printf '%s\n' "$LANG_KEYS" | sort))
-
             if [ -z "$NEW_KEYS" ]; then
               echo "No new keys found for ${LANG_FILE}."
             else
@@ -79,20 +71,18 @@ jobs:
               while read -r NEW_KEY; do
                 # Use grep to find the full line in the base messages file
                 # The -F flag treats the pattern as a fixed string, and -m 1 stops after the first match
-                # Add `|| true` to prevent the script from failing if no match is found
-                NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -F -m 1 "^${NEW_KEY}=" || true)
+                NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -E -m 1 "^${NEW_KEY}\s*=" || true)
                 
                 # Append the new key-value pair to the language file
                 if [ -n "$NEW_LINE" ]; then
                   # FIX: Use printf to correctly handle newlines and tr to ensure only printable characters are written.
-                  printf "%s\n" "${NEW_LINE}" | tr -cd '\11\12\15\40-\176\n' >> "${LANG_FILE}"
+                  printf "\n%s\n" "${NEW_LINE}" >> "${LANG_FILE}"
                 fi
               done <<< "$NEW_KEYS"
               
               CHANGES=$((CHANGES + 1))
             fi
           done
-
           if [ $CHANGES -gt 0 ]; then
             echo "Total files updated: ${CHANGES}"
             echo "changes_made=true" >> $GITHUB_OUTPUT
@@ -107,9 +97,9 @@ jobs:
         if: steps.sync.outputs.changes_made == 'true'
         run: |
           git checkout -b ${{ env.BRANCH_NAME }}
-          git add server/conf/i18n/messages.*
-          
-          # Check for staged changes before committing to prevent failure
+          git add server/conf/i18n/
+          git status
+          git diff
           if ! git diff-index --quiet --cached HEAD; then
             git commit -m "chore(i18n): Sync new keys and values from messages to messages.<lang> files"
             git push origin ${{ env.BRANCH_NAME }}
@@ -118,6 +108,10 @@ jobs:
             echo "No changes to commit. Skipping git commit and push."
             echo "pr_needed=false" >> $GITHUB_OUTPUT
           fi
+          # Show what changed before committing
+          echo "=== Changes in i18n files ==="
+          git diff server/conf/i18n/
+          echo "============================="
 
       - name: Create Pull Request
         if: steps.commit.outputs.pr_needed == 'true'
@@ -125,7 +119,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_BODY="This PR was automatically created by the 'Sync New Keys to Translations' workflow to ensure all translation files contain the new keys and their values added to the base \`messages\` file.
-
           The new values from the base file are a starting point for translators. Please review the added entries and update the translations as needed."
           
           PR_URL=$(gh pr create \
