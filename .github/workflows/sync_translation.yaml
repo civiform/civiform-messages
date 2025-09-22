@@ -4,7 +4,7 @@ name: Sync New Keys and Values to Translations
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main,annazhang-fix-workflow-to-sync-translation]
 
 jobs:
   sync-messages:
@@ -68,7 +68,7 @@ jobs:
             LANG_KEYS=$(extract_keys "${LANG_FILE}")
             
             # Find keys in base file that are NOT in language file
-            NEW_KEYS=$(comm -23 <(printf '%s\n' "$BASE_KEYS" | sort) <(printf '%s\n' "$LANG_KEYS" | sort))
+            NEW_KEYS=$(comm -23 <(echo "$BASE_KEYS" | sort) <(echo "$LANG_KEYS" | sort))
 
             if [ -z "$NEW_KEYS" ]; then
               echo "No new keys found for ${LANG_FILE}."
@@ -79,7 +79,8 @@ jobs:
               while read -r NEW_KEY; do
                 # Use grep to find the full line in the base messages file
                 # The -F flag treats the pattern as a fixed string, and -m 1 stops after the first match
-                NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -F -m 1 "^${NEW_KEY}=")
+                # FIX: Add `|| true` to prevent the script from failing if no match is found
+                NEW_LINE=$(echo "$MESSAGES_CONTENT" | grep -F -m 1 "^${NEW_KEY}=" || true)
                 
                 # Append the new key-value pair to the language file
                 if [ -n "$NEW_LINE" ]; then
