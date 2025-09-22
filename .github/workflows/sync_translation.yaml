@@ -4,7 +4,7 @@ name: Sync New Keys and Values to Translations
 on:
   workflow_dispatch:
   push:
-    branches: [main,annazhang-final-attemp-to-fix-workflow]
+    branches: [main]
 
 jobs:
   sync-messages:
