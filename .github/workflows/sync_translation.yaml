@@ -35,10 +35,8 @@ jobs:
           
           # Function to extract, clean, and isolate keys for robust processing
           extract_keys() {
-            # Use LC_ALL=C for reliable byte-level text processing to avoid encoding crashes.
             LC_ALL=C cat "$1" | \
-            tr -cd '\11\12\15\40-\176\n' | \
-            tr -d '\r' | \
+            tr -d '\r\xEF\xBB\xBF\xC2\xA0' | \
             grep -E -v '^\s*#|^$' | \
             awk -F'=' '{print $1}' | \
             sed 's/\s*$//'
