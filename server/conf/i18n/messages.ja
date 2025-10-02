@@ -490,3 +490,7 @@ map.locationNameLabel=Name key
 map.mapRegionAltText=Interactive map displaying locations
 
 map.maxLocationSelectionsLabel=Maximum location selections
+
+map.availableLocations=Available locations
+
+map.selectLocations=Select up to {0} locations
