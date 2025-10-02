@@ -491,3 +491,13 @@ map.locationNameLabel=Name key
 map.mapRegionAltText=Interactive map displaying locations
 
 map.maxLocationSelectionsLabel=Maximum location selections
+
+map.availableLocations=Available locations
+
+map.locationAddressHelpText=Select which key represents the location address.
+
+map.locationDetailsUrlHelpText=Select which key represents the location details URL.
+
+map.locationNameHelpText=Select which key represents the location name.
+
+map.selectLocations=Select up to {0} locations
