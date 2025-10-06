@@ -480,3 +480,13 @@ session.extend.button=I-extend ang Session
 session.extended.success=Na-extend na ang session
 session.extended.error=Hindi na-extend ang session
 translation.untranslated=Mananatiling hindi naka-translate ang string na ito para sa mga eksperimento sa imprastraktura ng pag-translate.
+
+map.availableLocations=Available locations
+
+map.locationAddressHelpText=Select which key represents the location address.
+
+map.locationDetailsUrlHelpText=Select which key represents the location details URL.
+
+map.locationNameHelpText=Select which key represents the location name.
+
+map.selectLocations=Select up to {0} locations
