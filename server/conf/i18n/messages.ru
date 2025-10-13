@@ -408,13 +408,18 @@ option.no=Нет
 option.notSure=Затрудняюсь ответить
 option.maybe=Возможно
 map.applyFiltersButtonText=Apply filters
+map.ariaLabelPreviousPage=Go to previous page of map locations
+map.ariaLabelNextPage=Go to next page of map locations
+map.ariaLabelPaginationList=Pagination for map locations
 map.availableLocations=Доступные местоположения
 map.selectLocations=Выберите до {0} местоположений
 map.filterLegendText=Filters
+map.goToPage=Go to page {0} of map locations
 map.locationLinkText=View more details
 map.locationsCount=Показано мест: {0} из {1}.
 map.locationsSelectedCount={0} of {1} maximum locations selected.
 map.noSelectionsMessage=Места не выбраны.
+map.paginationStatus=Now displaying page {0} of {1}.
 map.resetFiltersButtonText=Clear filters
 map.selectLocationButtonText=Select location
 map.selectedLocationsHeading=Выбранные места
@@ -485,13 +490,3 @@ session.extend.button=Продлить сеанс
 session.extended.success=Сеанс продлен.
 session.extended.error=Не удалось продлить сеанс.
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
-
-map.ariaLabelNextPage=Go to next page of map locations
-
-map.ariaLabelPaginationList=Pagination for map locations
-
-map.ariaLabelPreviousPage=Go to previous page of map locations
-
-map.goToPage=Go to page {0} of map locations
-
-map.paginationStatus=Now displaying page {0} of {1}.
