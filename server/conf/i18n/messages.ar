@@ -490,3 +490,5 @@ session.extend.button=تمديد الجلسة
 session.extended.success=تم تمديد الجلسة بنجاح
 session.extended.error=تعذَّر تمديد الجلسة
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+map.mapSelectedButtonText=Selected

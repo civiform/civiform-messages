@@ -490,3 +490,5 @@ session.extend.button=セッションを延長
 session.extended.success=セッションは正常に延長されました
 session.extended.error=セッションを延長できませんでした
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+map.mapSelectedButtonText=Selected
