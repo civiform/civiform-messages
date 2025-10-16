@@ -490,3 +490,5 @@ session.extend.button=I-extend ang Session
 session.extended.success=Na-extend na ang session
 session.extended.error=Hindi na-extend ang session
 translation.untranslated=Mananatiling hindi naka-translate ang string na ito para sa mga eksperimento sa imprastraktura ng pag-translate.
+
+map.mapSelectedButtonText=Selected

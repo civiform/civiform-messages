@@ -490,3 +490,5 @@ session.extend.button=ክፍለ-ጊዜን አራዝም
 session.extended.success=ክፍለ-ጊዜ በተሳካ ሁኔታ ተራዝሟል
 session.extended.error=ክፍለ-ጊዜን ማራዘም አልተሳካም
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+map.mapSelectedButtonText=Selected
