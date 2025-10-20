@@ -490,3 +490,7 @@ session.extend.button=Продлить сеанс
 session.extended.success=Сеанс продлен.
 session.extended.error=Не удалось продлить сеанс.
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+map.mapSelectedButtonText=Selected
+
+validation.numberRequired.v2=Must contain only numbers 0-9.

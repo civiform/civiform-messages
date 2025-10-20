@@ -490,3 +490,7 @@ session.extend.button=Gia hạn phiên
 session.extended.success=Đã gia hạn phiên thành công
 session.extended.error=Không gia hạn được phiên
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+map.mapSelectedButtonText=Selected
+
+validation.numberRequired.v2=Must contain only numbers 0-9.
