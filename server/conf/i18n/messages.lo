@@ -489,3 +489,7 @@ session.extend.button=ຂະຫຍາຍເຊດຊັນ
 session.extended.success=ຂະຫຍາຍເຊດຊັນສຳເລັດຜົນ
 session.extended.error=ຂະຫຍາຍເຊດຊັນບໍ່ສຳເລັດ
 translation.untranslated=ສະຕຣິງນີ້ຍັງບໍ່ໄດ້ຮັບການແປເນື່ອງຈາກຢູ່ໃນຂັ້ນທົດລອງໂຄງສ້າງພື້ນຖານການແປພາສາ.
+
+map.mapSelectedButtonText=Selected
+
+validation.numberRequired.v2=Must contain only numbers 0-9.
