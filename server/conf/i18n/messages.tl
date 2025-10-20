@@ -480,3 +480,37 @@ session.extend.button=I-extend ang Session
 session.extended.success=Na-extend na ang session
 session.extended.error=Hindi na-extend ang session
 translation.untranslated=Mananatiling hindi naka-translate ang string na ito para sa mga eksperimento sa imprastraktura ng pag-translate.
+
+map.addTagButton=Add tag
+
+map.addTagSubtitle=Add a tag to be displayed on certain locations where a selected key matches a certain value. When an applicant selects at least one of these locations, optionally display an alert in the Selected Locations area.
+
+map.addTagTitle=Tag
+
+map.ariaLabelNextPage=Go to next page of map locations
+
+map.ariaLabelPaginationList=Pagination for map locations
+
+map.ariaLabelPreviousPage=Go to previous page of map locations
+
+map.availableLocations=Available locations
+
+map.goToPage=Go to page {0} of map locations
+
+map.locationAddressHelpText=Select which key represents the location address.
+
+map.locationDetailsUrlHelpText=Select which key represents the location details URL.
+
+map.locationNameHelpText=Select which key represents the location name.
+
+map.mapSelectedButtonText=Selected
+
+map.paginationStatus=Now displaying page {0} of {1}.
+
+map.selectLocations=Select up to {0} locations
+
+map.settingTextLabel=Alert text
+
+map.valueLabel=Value
+
+validation.numberRequired.v2=Must contain only numbers 0-9.

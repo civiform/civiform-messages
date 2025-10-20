@@ -485,3 +485,27 @@ session.extend.button=Продлить сеанс
 session.extended.success=Сеанс продлен.
 session.extended.error=Не удалось продлить сеанс.
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+map.addTagButton=Add tag
+
+map.addTagSubtitle=Add a tag to be displayed on certain locations where a selected key matches a certain value. When an applicant selects at least one of these locations, optionally display an alert in the Selected Locations area.
+
+map.addTagTitle=Tag
+
+map.ariaLabelNextPage=Go to next page of map locations
+
+map.ariaLabelPaginationList=Pagination for map locations
+
+map.ariaLabelPreviousPage=Go to previous page of map locations
+
+map.goToPage=Go to page {0} of map locations
+
+map.mapSelectedButtonText=Selected
+
+map.paginationStatus=Now displaying page {0} of {1}.
+
+map.settingTextLabel=Alert text
+
+map.valueLabel=Value
+
+validation.numberRequired.v2=Must contain only numbers 0-9.
