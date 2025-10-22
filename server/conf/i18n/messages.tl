@@ -490,3 +490,19 @@ session.extend.button=I-extend ang Session
 session.extended.success=Na-extend na ang session
 session.extended.error=Hindi na-extend ang session
 translation.untranslated=Mananatiling hindi naka-translate ang string na ito para sa mga eksperimento sa imprastraktura ng pag-translate.
+
+map.addTagButton=Add tag
+
+map.addTagSubtitle=Add a tag to be displayed on certain locations where a selected key matches a certain value. When an applicant selects at least one of these locations, optionally display an alert in the Selected Locations area.
+
+map.addTagTitle=Tag
+
+map.locationLinkTextSr=View more details for {0}
+
+map.mapSelectedButtonText=Selected
+
+map.settingTextLabel=Alert text
+
+map.valueLabel=Value
+
+validation.numberRequired.v2=Must contain only numbers 0-9.

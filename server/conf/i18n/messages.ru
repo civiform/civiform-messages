@@ -490,3 +490,19 @@ session.extend.button=Продлить сеанс
 session.extended.success=Сеанс продлен.
 session.extended.error=Не удалось продлить сеанс.
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+map.addTagButton=Add tag
+
+map.addTagSubtitle=Add a tag to be displayed on certain locations where a selected key matches a certain value. When an applicant selects at least one of these locations, optionally display an alert in the Selected Locations area.
+
+map.addTagTitle=Tag
+
+map.locationLinkTextSr=View more details for {0}
+
+map.mapSelectedButtonText=Selected
+
+map.settingTextLabel=Alert text
+
+map.valueLabel=Value
+
+validation.numberRequired.v2=Must contain only numbers 0-9.
