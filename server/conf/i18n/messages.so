@@ -491,3 +491,23 @@ session.extend.button=Mudo dheerayso Kulanka
 session.extended.success=Kulanka si guul leh ayaa loo mudo dheereeyay
 session.extended.error=Waa lagu guul daraystay in la mudo dheereeyo kulanka
 translation.untranslated=Qoraalkan wuxuu ahaan doonnaa mid aan la turjumin si loogu tijaabiyo aaladaha turjumaadda.
+
+map.addTagButton=Add tag
+
+map.addTagSubtitle=Add a tag to be displayed on certain locations where a selected key matches a certain value. When an applicant selects at least one of these locations, optionally display an alert in the Selected Locations area.
+
+map.addTagTitle=Tag
+
+map.locationLinkTextSr=View more details for {0}
+
+map.mapSelectedButtonText=Selected
+
+map.settingTextLabel=Alert text
+
+map.switchToListView=Switch to list view
+
+map.switchToMapView=Switch to map view
+
+map.valueLabel=Value
+
+validation.numberRequired.v2=Must contain only numbers 0-9.
