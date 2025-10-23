@@ -490,3 +490,23 @@ session.extend.button=ክፍለ-ጊዜን አራዝም
 session.extended.success=ክፍለ-ጊዜ በተሳካ ሁኔታ ተራዝሟል
 session.extended.error=ክፍለ-ጊዜን ማራዘም አልተሳካም
 translation.untranslated=This string remains untranslated for translation infrastructure experiments.
+
+map.addTagButton=Add tag
+
+map.addTagSubtitle=Add a tag to be displayed on certain locations where a selected key matches a certain value. When an applicant selects at least one of these locations, optionally display an alert in the Selected Locations area.
+
+map.addTagTitle=Tag
+
+map.locationLinkTextSr=View more details for {0}
+
+map.mapSelectedButtonText=Selected
+
+map.settingTextLabel=Alert text
+
+map.switchToListView=Switch to list view
+
+map.switchToMapView=Switch to map view
+
+map.valueLabel=Value
+
+validation.numberRequired.v2=Must contain only numbers 0-9.
